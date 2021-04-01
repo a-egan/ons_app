@@ -1,4 +1,4 @@
-# ons_app_v1
+# ons_app
 
 This app provides a brief overview of the latest ONS labour market stats.
 
