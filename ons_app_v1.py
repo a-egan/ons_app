@@ -1,20 +1,23 @@
-import requests
-import os
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import plotly as pl
 import streamlit as st
+import plotly as pl
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+import os
+import requests
+IMG = "chart.png"
+st.set_page_config(layout="wide")
 
+st.image(IMG, width=150)
 st.title("UK Labour Market Statistics Dashboard")
-st.header("""
-    A brief overview of the latest ONS labour market stats.
-    """)
 st.markdown(
     """
-    Created by [Anthony Egan](https://uk.linkedin.com/in/anthony-egan-51b538150)
+    An interactive overview of the latest ONS labour market statistics created by [Anthony Egan](https://uk.linkedin.com/in/anthony-egan-51b538150).
     """
 )
+
+col1, col2 = st.beta_columns(2)
+col3, col4 = st.beta_columns(2)
 
 
 @st.cache
@@ -36,11 +39,11 @@ data = grab_ONS_time_series_data("LMS", "MGSX")
 
 # Check we have the right time series
 title_text = data["description"]["title"]
-st.header(title_text)
+col1.subheader(title_text)
 # Put the data into a dataframe and convert types
 # Note that you"ll need to change months if you"re
 # using data at a different frequency
-df = pd.DataFrame(pd.io.json.json_normalize(data["months"]))
+df = pd.DataFrame(pd.json_normalize(data["months"]))
 
 # Put the data in a standard datetime format
 df["date"] = pd.to_datetime(df["date"])
@@ -48,30 +51,25 @@ df["value"] = df["value"].astype(float)
 df = df.set_index("date")
 
 # Display data in streamlit
-st.write("Chart")
-st.line_chart(df["value"])
+col1.write("Chart")
+col1.line_chart(df["value"])
 
-agree1 = st.checkbox("Show unemployment rate data table")
+agree1 = col1.checkbox("Show unemployment rate data table")
 if agree1:
-    st.write("Table")
+    col1.write("Table")
     df = df.rename(columns={"label": "period"})
-    st.write(df[["period", "value"]])
-
-# Source
-st.write("Source:", df["sourceDataset"][0])
-# Update Date
-st.write("Last updated:", df["updateDate"][-1])
+    col1.write(df[["period", "value"]])
 
 # 2.Employment rate (aged 16 to 64, seasonally adjusted)
 data = grab_ONS_time_series_data("LMS", "LF24")
 
 # Check we have the right time series
 title_text = data["description"]["title"]
-st.header(title_text)
+col2.subheader(title_text)
 # Put the data into a dataframe and convert types
 # Note that you"ll need to change months if you"re
 # using data at a different frequency
-df = pd.DataFrame(pd.io.json.json_normalize(data["months"]))
+df = pd.DataFrame(pd.json_normalize(data["months"]))
 
 # Put the data in a standard datetime format
 df["date"] = pd.to_datetime(df["date"])
@@ -79,19 +77,13 @@ df["value"] = df["value"].astype(float)
 df = df.set_index("date")
 
 # Display data in streamlit
-st.write("Chart")
-st.line_chart(df["value"])
-agree2 = st.checkbox("Show employment rate data table")
+col2.write("Chart")
+col2.line_chart(df["value"])
+agree2 = col2.checkbox("Show employment rate data table")
 if agree2:
-    st.write("Table")
+    col2.write("Table")
     df = df.rename(columns={"label": "period"})
-    st.write(df[["period", "value"]])
-
-# Source
-st.write("Source:", df["sourceDataset"][0])
-# Update Date
-st.write("Last updated:", df["updateDate"][-1])
-
+    col2.write(df[["period", "value"]])
 
 # 3.LFS: Economic inactivity rate: UK: All: Aged 16-64: %: SA
 
@@ -99,11 +91,11 @@ data = grab_ONS_time_series_data("LMS", "LF2S")
 
 # Check we have the right time series
 title_text = data["description"]["title"]
-st.header(title_text)
+col3.subheader(title_text)
 # Put the data into a dataframe and convert types
 # Note that you"ll need to change months if you"re
 # using data at a different frequency
-df = pd.DataFrame(pd.io.json.json_normalize(data["months"]))
+df = pd.DataFrame(pd.json_normalize(data["months"]))
 
 # Put the data in a standard datetime format
 df["date"] = pd.to_datetime(df["date"])
@@ -111,18 +103,13 @@ df["value"] = df["value"].astype(float)
 df = df.set_index("date")
 
 # Display data in streamlit
-st.write("Chart")
-st.line_chart(df["value"])
-agree3 = st.checkbox("Show inactivity rate data table")
+col3.write("Chart")
+col3.line_chart(df["value"])
+agree3 = col3.checkbox("Show inactivity rate data table")
 if agree3:
     st.write("Table")
     df = df.rename(columns={"label": "period"})
     st.write(df[["period", "value"]])
-
-# Source
-st.write("Source:", df["sourceDataset"][0])
-# Update Date
-st.write("Last updated:", df["updateDate"][-1])
 
 # 4.UK Vacancies (thousands) - Total
 
@@ -130,11 +117,11 @@ data = grab_ONS_time_series_data("UNEM", "AP2Y")
 
 # Check we have the right time series
 title_text = data["description"]["title"]
-st.header(title_text)
+col4.subheader(title_text)
 # Put the data into a dataframe and convert types
 # Note that you"ll need to change months if you"re
 # using data at a different frequency
-df = pd.DataFrame(pd.io.json.json_normalize(data["months"]))
+df = pd.DataFrame(pd.json_normalize(data["months"]))
 
 # Put the data in a standard datetime format
 df["date"] = pd.to_datetime(df["date"])
@@ -142,18 +129,13 @@ df["value"] = df["value"].astype(float)
 df = df.set_index("date")
 
 # Display data in streamlit
-st.write("Chart")
-st.line_chart(df["value"])
-agree4 = st.checkbox("Show vacancies data table")
+col4.write("Chart")
+col4.line_chart(df["value"])
+agree4 = col4.checkbox("Show vacancies data table")
 if agree4:
     st.write("Table")
     df = df.rename(columns={"label": "period"})
     st.write(df[["period", "value"]])
-
-# Source
-st.write("Source:", df["sourceDataset"][0])
-# Update Date
-st.write("Last updated:", df["updateDate"][-1])
 
 # 5. Regional unemployment rates
 st.header("Regional unemployment rates (seasonally adjusted)")
@@ -163,7 +145,7 @@ data_East = grab_ONS_time_series_data("LMS", "YCNH")
 geo = "East"
 
 # Put the data into a dataframe and convert types
-df = pd.DataFrame(pd.io.json.json_normalize(data_East["months"]))
+df = pd.DataFrame(pd.json_normalize(data_East["months"]))
 
 # Put the data in a standard datetime format
 df["date"] = pd.to_datetime(df["date"])
@@ -180,7 +162,7 @@ data_EM = grab_ONS_time_series_data("LMS", "YCNF")
 geo = "East Midlands"
 
 # Put the data into a dataframe and convert types
-df = pd.DataFrame(pd.io.json.json_normalize(data_EM["months"]))
+df = pd.DataFrame(pd.json_normalize(data_EM["months"]))
 
 # Put the data in a standard datetime format
 df["date"] = pd.to_datetime(df["date"])
@@ -196,7 +178,7 @@ data_EM = grab_ONS_time_series_data("LMS", "YCNI")
 geo = "London"
 
 # Put the data into a dataframe and convert types
-df = pd.DataFrame(pd.io.json.json_normalize(data_EM["months"]))
+df = pd.DataFrame(pd.json_normalize(data_EM["months"]))
 
 # Put the data in a standard datetime format
 df["date"] = pd.to_datetime(df["date"])
@@ -212,7 +194,7 @@ data_EM = grab_ONS_time_series_data("LMS", "YCNC")
 geo = "North East"
 
 # Put the data into a dataframe and convert types
-df = pd.DataFrame(pd.io.json.json_normalize(data_EM["months"]))
+df = pd.DataFrame(pd.json_normalize(data_EM["months"]))
 
 # Put the data in a standard datetime format
 df["date"] = pd.to_datetime(df["date"])
@@ -228,7 +210,7 @@ data_EM = grab_ONS_time_series_data("LMS", "YCND")
 geo = "North West"
 
 # Put the data into a dataframe and convert types
-df = pd.DataFrame(pd.io.json.json_normalize(data_EM["months"]))
+df = pd.DataFrame(pd.json_normalize(data_EM["months"]))
 
 # Put the data in a standard datetime format
 df["date"] = pd.to_datetime(df["date"])
@@ -244,7 +226,7 @@ data_EM = grab_ONS_time_series_data("LMS", "ZSFB")
 geo = "Northern Ireland"
 
 # Put the data into a dataframe and convert types
-df = pd.DataFrame(pd.io.json.json_normalize(data_EM["months"]))
+df = pd.DataFrame(pd.json_normalize(data_EM["months"]))
 
 # Put the data in a standard datetime format
 df["date"] = pd.to_datetime(df["date"])
@@ -260,7 +242,7 @@ data_EM = grab_ONS_time_series_data("LMS", "YCNN")
 geo = "Scotland"
 
 # Put the data into a dataframe and convert types
-df = pd.DataFrame(pd.io.json.json_normalize(data_EM["months"]))
+df = pd.DataFrame(pd.json_normalize(data_EM["months"]))
 
 # Put the data in a standard datetime format
 df["date"] = pd.to_datetime(df["date"])
@@ -276,7 +258,7 @@ data_EM = grab_ONS_time_series_data("LMS", "YCNJ")
 geo = "South East"
 
 # Put the data into a dataframe and convert types
-df = pd.DataFrame(pd.io.json.json_normalize(data_EM["months"]))
+df = pd.DataFrame(pd.json_normalize(data_EM["months"]))
 
 # Put the data in a standard datetime format
 df["date"] = pd.to_datetime(df["date"])
@@ -292,7 +274,7 @@ data_EM = grab_ONS_time_series_data("LMS", "YCNK")
 geo = "South West"
 
 # Put the data into a dataframe and convert types
-df = pd.DataFrame(pd.io.json.json_normalize(data_EM["months"]))
+df = pd.DataFrame(pd.json_normalize(data_EM["months"]))
 
 # Put the data in a standard datetime format
 df["date"] = pd.to_datetime(df["date"])
@@ -309,7 +291,7 @@ data_EM = grab_ONS_time_series_data("LMS", "YCNM")
 geo = "Wales"
 
 # Put the data into a dataframe and convert types
-df = pd.DataFrame(pd.io.json.json_normalize(data_EM["months"]))
+df = pd.DataFrame(pd.json_normalize(data_EM["months"]))
 
 # Put the data in a standard datetime format
 df["date"] = pd.to_datetime(df["date"])
@@ -326,7 +308,7 @@ data_EM = grab_ONS_time_series_data("LMS", "YCNG")
 geo = "West Midlands"
 
 # Put the data into a dataframe and convert types
-df = pd.DataFrame(pd.io.json.json_normalize(data_EM["months"]))
+df = pd.DataFrame(pd.json_normalize(data_EM["months"]))
 
 # Put the data in a standard datetime format
 df["date"] = pd.to_datetime(df["date"])
@@ -342,7 +324,7 @@ data_EM = grab_ONS_time_series_data("LMS", "YCNE")
 geo = "Yorks & the Humber"
 
 # Put the data into a dataframe and convert types
-df = pd.DataFrame(pd.io.json.json_normalize(data_EM["months"]))
+df = pd.DataFrame(pd.json_normalize(data_EM["months"]))
 
 # Put the data in a standard datetime format
 df["date"] = pd.to_datetime(df["date"])
@@ -378,11 +360,6 @@ if agree5:
     st.write(df_all[["East", "East Midlands", "London", "North East", "North West", "Northern Ireland",
                      "Scotland", "South East", "South West", "Wales", "West Midlands", "Yorks & the Humber"]])
 
-# Source
-st.write("Source:", df["sourceDataset"][0])
-# Update Date
-st.write("Last updated:", df["updateDate"][-1])
-
 
 # 4 Unemployment rates by age band
 st.header("Unemployment rates by age band (seasonally adjusted)")
@@ -393,7 +370,7 @@ data_EM = grab_ONS_time_series_data("LMS", "MGWY")
 geo = "16-24"
 
 # Put the data into a dataframe and convert types
-df = pd.DataFrame(pd.io.json.json_normalize(data_EM["months"]))
+df = pd.DataFrame(pd.json_normalize(data_EM["months"]))
 
 # Put the data in a standard datetime format
 df["date"] = pd.to_datetime(df["date"])
@@ -409,7 +386,7 @@ data_EM = grab_ONS_time_series_data("LMS", "MGXB")
 geo = "25-49"
 
 # Put the data into a dataframe and convert types
-df = pd.DataFrame(pd.io.json.json_normalize(data_EM["months"]))
+df = pd.DataFrame(pd.json_normalize(data_EM["months"]))
 
 # Put the data in a standard datetime format
 df["date"] = pd.to_datetime(df["date"])
@@ -425,7 +402,7 @@ data_EM = grab_ONS_time_series_data("LMS", "YBVW")
 geo = "50+"
 
 # Put the data into a dataframe and convert types
-df = pd.DataFrame(pd.io.json.json_normalize(data_EM["months"]))
+df = pd.DataFrame(pd.json_normalize(data_EM["months"]))
 
 # Put the data in a standard datetime format
 df["date"] = pd.to_datetime(df["date"])
@@ -460,7 +437,6 @@ if agree5:
     df_all2 = df_all2.rename(columns={"label_left": "period"})
     st.write(df_all2[["period", "16-24", "25-49", "50+"]])
 
-# Source
-st.write("Source:", df["sourceDataset"][0])
+
 # Update Date
 st.write("Last updated:", df["updateDate"][-1])
